@@ -1,0 +1,38 @@
+{
+  "name": "git-version-bumper",
+  "version": "1.0.0",
+  "description": "Bump git version, following semver conventions.",
+  "main": "cli.js",
+  "bin": {
+    "version-bumper": "./cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AAlakkad/git-version-bumper.git"
+  },
+  "keywords": [
+    "git",
+    "nodejs",
+    "versioning",
+    "semver"
+  ],
+  "author": "Ammar Alakkad <am.alakkad@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AAlakkad/git-version-bumper/issues"
+  },
+  "homepage": "https://github.com/AAlakkad/git-version-bumper#readme",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "chalk": "^2.4.1",
+    "git-tags": "^0.2.4",
+    "inquirer": "^6.0.0",
+    "semver-regex": "^2.0.0"
+  },
+  "devDependencies": {
+    "eslint-config-prettier": "^2.9.0"
+  }
+}
