@@ -37,9 +37,7 @@ gittags.latest((err, tag) => {
     inquirer.prompt(questions).then(answer => {
         version = semverRegex().exec(tag)[0];
         bumped = getBumbedVersion(version, answer.part);
-        console.log(bumped);
         // create new git tag
-        // git tag ${bumped}
         exec(`git tag ${bumped}`, (error, stdout, stderr) => {
             if (error) {
                 console.log(
