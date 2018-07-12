@@ -25,7 +25,7 @@ const filterTags = repo => {
         try {
             tags = parseTags(tags);
         } catch (e) {
-            return cb(e)
+            throw e;
         }
     });
 }
