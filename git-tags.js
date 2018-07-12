@@ -1,5 +1,5 @@
 /**
- * This is copied from https://github.com/bfricka/node-git-tags/blob/master/src/git-tags.js
+ * This code is adapted from https://github.com/bfricka/node-git-tags/blob/master/src/git-tags.js
  * That package is not maintained.
  */
 const _ = require('lodash');
