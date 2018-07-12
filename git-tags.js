@@ -4,20 +4,8 @@
  */
 const _ = require('lodash');
 const path = require('path');
-const exec = require('child_process').exec;
 const semver = require('semver');
-
-const execPromise = (command, args) => {
-    return new Promise((resolve, reject) => {
-        exec(command, args, (err, stdout, stderr) => {
-            if (err) {
-                reject(stderr);
-            }
-
-            resolve(stdout);
-        });
-    });
-};
+const execPromise = require('./utilities/execPromise');
 
 const getTags = repo => {
     return execPromise('git tag', { cwd: repo }).then(stdout => {

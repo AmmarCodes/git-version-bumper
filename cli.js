@@ -4,7 +4,7 @@ const gittags = require("./git-tags");
 const inquirer = require("inquirer");
 const semverRegex = require("semver-regex");
 const chalk = require("chalk");
-const exec = require("child_process").exec;
+const execPromise = require('./utilities/execPromise');
 
 const PARTS = {
     patch: 2,
@@ -35,22 +35,20 @@ gittags.latest().then(tag => {
     inquirer.prompt(questions).then(answer => {
         version = semverRegex().exec(tag)[0];
         bumped = getBumbedVersion(version, answer.part);
-        // create new git tag
-        exec(`git tag ${bumped}`, (error, stdout, stderr) => {
-            if (error) {
-                console.log(
-                    chalk.red("Could not create"),
-                    chalk.red.bold(bumped),
-                    chalk.red("tag")
-                );
-                console.log(stderr);
-                process.exit(1);
-            }
 
+        execPromise(`git tag ${bumped}`).then(stdout => {
             console.log(
                 chalk.green("Bumped version to "),
                 chalk.bgGreen.black(bumped)
             );
+        }).catch(err => {
+            console.log(
+                chalk.red("Could not create"),
+                chalk.red.bold(bumped),
+                chalk.red("tag")
+            );
+            console.log(err);
+            process.exit(1);
         });
     });
 }).catch(err => {
