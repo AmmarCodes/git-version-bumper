@@ -33,22 +33,25 @@ gittags.latest().then(tag => {
 
     // prompt for what part of the version you want to bump.
     inquirer.prompt(questions).then(answer => {
-        version = semverRegex().exec(tag)[0];
-        bumped = getBumbedVersion(version, answer.part);
+        git.getRepoConfig().then(config => {
+            let version = semverRegex().exec(tag)[0];
+            let bumped = getBumbedVersion(version, answer.part);
+            let bumpedPrefix = config['gitflow.prefix.release'] + bumped || bumped;
 
-        git.createTag(bumped).then(() => {
-            console.log(
-                chalk.green("Bumped version to "),
-                chalk.bgGreen.black(bumped)
-            );
-        }).catch(err => {
-            console.log(
-                chalk.red("Could not create"),
-                chalk.red.bold(bumped),
-                chalk.red("tag")
-            );
-            console.log(err);
-            process.exit(1);
+            git.createTag(bumpedPrefix).then(() => {
+                console.log(
+                    chalk.green("Bumped version to "),
+                    chalk.bgGreen.black(bumped)
+                );
+            }).catch(err => {
+                console.log(
+                    chalk.red("Could not create"),
+                    chalk.red.bold(bumped),
+                    chalk.red("tag")
+                );
+                console.log(err);
+                process.exit(1);
+            });
         });
     });
 }).catch(err => {

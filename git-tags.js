@@ -16,11 +16,18 @@ const parseTags = data => {
 
 const filterTags = repo => {
     return git.getTags(repo).then(tags => {
-        try {
-            return parseTags(tags);
-        } catch (e) {
-            throw e;
-        }
+        return git.getRepoConfig(repo).then(config => {
+            let gitFloConfigs = Object.keys(config).filter(item => item.indexOf('gitflow') === 0);
+
+            if (gitFloConfigs.length > 0) {
+                let releasePrefix = config['gitflow.prefix.release'];
+                let gitFloTags = tags.split('\n').filter(tag => tag.indexOf(releasePrefix) === 0).map(tag => tag.substring(releasePrefix.length)).join('\n');
+
+                return parseTags(gitFloTags);
+            } else {
+                return parseTags(tags);
+            }
+        });
     });
 }
 
