@@ -4,7 +4,7 @@ const gittags = require("./git-tags");
 const inquirer = require("inquirer");
 const semverRegex = require("semver-regex");
 const chalk = require("chalk");
-const execPromise = require('./utilities/execPromise');
+const git = require('./utilities/git');
 
 const PARTS = {
     patch: 2,
@@ -36,7 +36,7 @@ gittags.latest().then(tag => {
         version = semverRegex().exec(tag)[0];
         bumped = getBumbedVersion(version, answer.part);
 
-        execPromise(`git tag ${bumped}`).then(stdout => {
+        git.createTag(bumped).then(() => {
             console.log(
                 chalk.green("Bumped version to "),
                 chalk.bgGreen.black(bumped)

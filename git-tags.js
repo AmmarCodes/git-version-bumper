@@ -5,13 +5,7 @@
 const _ = require('lodash');
 const path = require('path');
 const semver = require('semver');
-const execPromise = require('./utilities/execPromise');
-
-const getTags = repo => {
-    return execPromise('git tag', { cwd: repo }).then(stdout => {
-        return stdout.toString();
-    });
-}
+const git = require('./utilities/git');
 
 const parseTags = data => {
     return _.compact(data.split('\n'))
@@ -21,7 +15,7 @@ const parseTags = data => {
 }
 
 const filterTags = repo => {
-    return getTags(repo).then(tags => {
+    return git.getTags(repo).then(tags => {
         try {
             return parseTags(tags);
         } catch (e) {
