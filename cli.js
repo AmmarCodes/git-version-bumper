@@ -19,9 +19,7 @@ const questions = [{
     choices: ["Patch (?.?.x)", "Minor (?.x.?)", "Major (x.?.?)"]
 }];
 
-gittags.latest((err, tag) => {
-    if (err) throw err;
-
+gittags.latest().then(tag => {
     if (!tag || !semverRegex().test(tag)) {
         console.log(chalk.red("You do not have any version following semver yet!"));
         console.log(
@@ -55,6 +53,8 @@ gittags.latest((err, tag) => {
             );
         });
     });
+}).catch(err => {
+    throw err;
 });
 
 function parseVersionPart(partString) {
