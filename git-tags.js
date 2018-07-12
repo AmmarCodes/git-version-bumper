@@ -23,7 +23,7 @@ const parseTags = data => {
 const filterTags = repo => {
     return getTags(repo).then(tags => {
         try {
-            tags = parseTags(tags);
+            return parseTags(tags);
         } catch (e) {
             throw e;
         }
