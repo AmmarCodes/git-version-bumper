@@ -36,7 +36,9 @@ gittags.latest().then(tag => {
         git.getRepoConfig().then(config => {
             let version = semverRegex().exec(tag)[0];
             let bumped = getBumbedVersion(version, answer.part);
-            let bumpedPrefix = config['gitflow.prefix.release'] + bumped || bumped;
+            let bumpedPrefix = config.hasOwnProperty('gitflow.prefix.release')
+                ? config['gitflow.prefix.release'] + bumped
+                : bumped;
 
             git.createTag(bumpedPrefix).then(() => {
                 console.log(
