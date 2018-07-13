@@ -1,67 +1,50 @@
 /**
- * This is copied from https://github.com/bfricka/node-git-tags/blob/master/src/git-tags.js
+ * This code is adapted from https://github.com/bfricka/node-git-tags/blob/master/src/git-tags.js
  * That package is not maintained.
  */
-var _ = require('lodash');
-var path = require('path');
-var exec = require('child_process').exec;
-var semver = require('semver');
+const _ = require('lodash');
+const path = require('path');
+const semver = require('semver');
+const git = require('./utilities/git');
 
-function getTags(repo, cb) {
-    exec('git tag', {
-        cwd: repo
-    }, function (err, stdout, stderr) {
-        if (err) return cb(err);
-        return cb(null, stdout.toString());
-    });
-}
-
-function parseTags(data) {
+const parseTags = data => {
     return _.compact(data.split('\n'))
         .filter(semver.valid)
         .sort(semver.compare)
         .reverse();
 }
 
-function filterTags(repo, cb) {
-    getTags(repo, function (err, tags) {
-        if (err) {
-            return cb(err)
-        }
-
+const filterTags = repo => {
+    return git.getTags(repo).then(tags => {
         try {
-            tags = parseTags(tags);
+            return parseTags(tags);
         } catch (e) {
-            return cb(e)
+            throw e;
         }
-
-        cb(null, tags);
     });
 }
 
-function normalizeFn(fn) {
-    return function (repo, cb) {
-        if (cb == null) {
-            cb = repo;
-            repo = process.cwd();
-        }
-
-        if (!repo) {
-            repo = process.cwd();
-        }
-
-        if (repo.charAt(0) === '.') {
-            repo = path.resolve(repo);
-        }
-
-        filterTags(repo, function (err, tags) {
-            if (err) return cb('Error getting Git tags:\n' + err);
-            return cb(null, fn(tags));
+const normalizeFn = fn => {
+    return repo => {
+        return new Promise((resolve, reject) => {
+            if (!repo) {
+                repo = process.cwd();
+            }
+    
+            if (repo.charAt(0) === '.') {
+                repo = path.resolve(repo);
+            }
+    
+            filterTags(repo).then(tags => {
+                resolve(fn(tags));
+            }).catch(error => {
+                reject(error);
+            })
         });
     };
 }
 
-function ret(arg) {
+const ret = arg => {
     return arg;
 }
 

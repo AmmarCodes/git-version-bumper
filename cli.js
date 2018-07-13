@@ -4,7 +4,7 @@ const gittags = require("./git-tags");
 const inquirer = require("inquirer");
 const semverRegex = require("semver-regex");
 const chalk = require("chalk");
-const exec = require("child_process").exec;
+const git = require('./utilities/git');
 
 const PARTS = {
     patch: 2,
@@ -19,9 +19,7 @@ const questions = [{
     choices: ["Patch (?.?.x)", "Minor (?.x.?)", "Major (x.?.?)"]
 }];
 
-gittags.latest((err, tag) => {
-    if (err) throw err;
-
+gittags.latest().then(tag => {
     if (!tag || !semverRegex().test(tag)) {
         console.log(chalk.red("You do not have any version following semver yet!"));
         console.log(
@@ -37,24 +35,24 @@ gittags.latest((err, tag) => {
     inquirer.prompt(questions).then(answer => {
         version = semverRegex().exec(tag)[0];
         bumped = getBumbedVersion(version, answer.part);
-        // create new git tag
-        exec(`git tag ${bumped}`, (error, stdout, stderr) => {
-            if (error) {
-                console.log(
-                    chalk.red("Could not create"),
-                    chalk.red.bold(bumped),
-                    chalk.red("tag")
-                );
-                console.log(stderr);
-                process.exit(1);
-            }
 
+        git.createTag(bumped).then(() => {
             console.log(
                 chalk.green("Bumped version to "),
                 chalk.bgGreen.black(bumped)
             );
+        }).catch(err => {
+            console.log(
+                chalk.red("Could not create"),
+                chalk.red.bold(bumped),
+                chalk.red("tag")
+            );
+            console.log(err);
+            process.exit(1);
         });
     });
+}).catch(err => {
+    throw err;
 });
 
 function parseVersionPart(partString) {
